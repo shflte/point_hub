@@ -1,10 +1,43 @@
-from flask import Flask, render_template, request, jsonify
-from flask_oauthlib.client import OAuth
+from flask import Flask, redirect, url_for, session, request, jsonify, render_template
+from oauth import init_oauth, google
 from dotenv import load_dotenv
 
 app = Flask(__name__)
+app.secret_key = load_dotenv("GOOGLE_CLIENT_SECRET")
+init_oauth(app)
 
-# Set up your database and other configurations
+@app.route('/')
+def home():
+    if 'google_token' in session:
+        user_info = google.get('userinfo').data
+        return f"Hello, {user_info['name']}! You are logged in with Google."
+    else:
+        return redirect(url_for('login'))
+
+@app.route('/login')
+def login():
+    return google.authorize(callback=url_for('authorized', _external=True))
+
+@app.route('/logout')
+def logout():
+    session.pop('google_token', None)
+    return 'Logged out.'
+
+@app.route('/authorized')
+def authorized():
+    resp = google.authorized_response()
+    if resp is None:
+        return 'Access denied: reason={0} error={1}'.format(
+            request.args['error_reason'],
+            request.args['error_description']
+        )
+    session['google_token'] = (resp['access_token'], '')
+    return redirect(url_for('home'))
+
+@google.tokengetter
+def get_google_oauth_token():
+    return session.get('google_token')
+# 
 
 @app.route('/')
 def root():
