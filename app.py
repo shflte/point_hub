@@ -14,7 +14,28 @@ def root():
 def point_hub():
     return render_template('point-hub.html')
 
-@app.route('/updatePoints', methods=['POST'])
+@app.route('/getUserInfo')
+def get_user_info():
+    try:
+        current_points = 100
+        points_per_click = 5
+
+        user_info = {
+            'currentPoints': current_points,
+            'pointsPerClick': points_per_click
+        }
+
+        return jsonify({
+            'status': 'success',
+            'userInfo': user_info
+        })
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        })
+
+@app.route('/incrementPoints', methods=['POST'])
 def update_points():
     points_per_click = request.form.get('pointsPerClick')
 
