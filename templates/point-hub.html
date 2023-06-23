@@ -6,8 +6,8 @@
 </head>
 <body>
   <h1>Point Hub</h1>
-  <button id="pointButton">Click to Earn Points</button>
-  <p id="pointCount">Points: 0</p>
+  <button id="pointButton">Earn +<span id="pointsPerClick"></span> Points</button>
+  <p id="pointCount">Points: <span id="currentPoints"></span></p>
   
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
