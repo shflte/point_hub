@@ -8,7 +8,17 @@ app = Flask(__name__)
 
 @app.route('/')
 def root():
-    return render_template('point-hub.html')
+    # check if user is logged in by checking if jwt token is present in request cookies
+    logged_in = False
+    
+    if logged_in:
+        login()
+    else:
+        return point_hub()
+
+@app.route('/login')
+def login():
+    return render_template('login.html')
 
 @app.route('/point-hub')
 def point_hub():

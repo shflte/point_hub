@@ -1,0 +1,39 @@
+services:
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: shflte
+      POSTGRES_PASSWORD: 910615
+      POSTGRES_DB: point_hub
+    volumes:
+      - /home/shflte/point_hub/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - /home/shflte/point_hub/postgres-data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    restart: always
+    depends_on: 
+      - db
+    ports:
+      - 8080:8080
+
+  web:
+    image: nginx
+    volumes:
+      - /home/shflte/nginx_config/nginx.conf:/etc/nginx/nginx.conf
+      - /home/shflte/nginx_config/cert.pem:/etc/nginx/cert.pem
+      - /home/shflte/nginx_config/privkey.pem:/etc/nginx/privkey.pem
+    ports:
+      - "443:443"
+      - "80:80"
+    environment:
+      - NGINX_HOST=pointhub.xyz
+      - NGINX_PORT=443
+
+  app:
+    image: pointhub:latest
+    ports:
+      - 5000:5000
+    restart: always
